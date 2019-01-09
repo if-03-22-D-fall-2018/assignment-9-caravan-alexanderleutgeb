@@ -81,6 +81,29 @@ void add_pack_animal(Caravan caravan, PackAnimal animal)
 
 void remove_pack_animal(Caravan caravan, PackAnimal animal)
 {
+
+  if (animal != 0){
+    Node current = caravan->head;
+    Node prev;
+    if (current != 0 && current->animal == animal) {
+      caravan->head = current->next;
+      sfree(current);
+      remove_from_caravan(animal, caravan);
+      caravan->length--;
+      return;
+    }
+
+    while (current != 0 && current->animal != animal ) {
+      prev = current;
+      current=current->next;
+    }
+
+    if (current==0) return;
+      prev->next = current->next;
+      sfree(current);
+      remove_from_caravan(animal, caravan);
+      caravan->length --;
+  }
 }
 
 
@@ -97,11 +120,25 @@ int get_caravan_load(Caravan caravan)
 
 void unload(Caravan caravan)
 {
+  Node current = caravan->head;
+  while (current!=0) {
+    unload(current->animal);
+    current = current->next;
+  }
 }
 
 int get_caravan_speed(Caravan caravan)
 {
-  return 0;
+
+  Node current = caravan->head;
+  int lowestSpeed = get_actual_speed(current->next->animal);
+  while (current != 0) {
+    if (get_actual_speed(current->animal) < lowestSpeed) {
+      lowestSpeed = get_actual_speed(current->animal);
+    }
+    current=current->next;
+  }
+  return lowestSpeed;
 }
 
 void optimize_load(Caravan caravan)
